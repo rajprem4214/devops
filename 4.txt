@@ -1,0 +1,112 @@
+Kubernetes Engine: Qwik Start
+
+Task 1. Set a default compute zone
+Your compute zone is an approximate regional location in which your clusters and their resources live. For example, us-central1-a is a zone in the us-central1 region. Start a new session in Cloud Shell.
+
+Set the default compute region:
+
+gcloud config set compute/region "REGION"
+Copied!
+Expected output:
+
+Updated property [compute/region].
+Set the default compute zone:
+
+gcloud config set compute/zone "ZONE"
+Copied!
+Expected output:
+
+Updated property [compute/zone].
+Task 2. Create a GKE cluster
+A cluster consists of at least one cluster master machine and multiple worker machines called nodes. Nodes are Compute Engine virtual machine (VM) instances that run the Kubernetes processes necessary to make them part of the cluster.
+
+Note: Cluster names must start with a letter and end with an alphanumeric, and cannot be longer than 40 characters.
+Run the following command:
+
+Create a cluster
+
+gcloud container clusters create --machine-type=e2-medium --zone=ZONE lab-cluster
+Copied!
+You can ignore any warnings in the output. It might take several minutes to finish creating the cluster.
+
+Expected output:
+
+NAME: lab-cluster
+LOCATION: ZONE
+MASTER_VERSION: 1.22.8-gke.202
+MASTER_IP: 34.67.240.12
+MACHINE_TYPE: e2-medium
+NODE_VERSION: 1.22.8-gke.202
+NUM_NODES: 3
+STATUS: RUNNING
+Click Check my progress to verify the objective.
+Create a GKE cluster
+
+Task 3. Get authentication credentials for the cluster
+After creating your cluster, you need authentication credentials to interact with it.
+
+Authenticate with the cluster:
+
+gcloud container clusters get-credentials lab-cluster
+Copied!
+Expected output:
+
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for my-cluster.
+Task 4. Deploy an application to the cluster
+You can now deploy a containerized application to the cluster. For this lab, you'll run hello-app in your cluster.
+
+GKE uses Kubernetes objects to create and manage your cluster's resources. Kubernetes provides the Deployment object for deploying stateless applications like web servers. Service objects define rules and load balancing for accessing your application from the internet.
+
+To create a new Deployment hello-server from the hello-app container image, run the following kubectl create command:
+
+kubectl create deployment hello-server --image=gcr.io/google-samples/hello-app:1.0
+Copied!
+Expected output:
+
+deployment.apps/hello-server created
+This Kubernetes command creates a Deployment object that represents hello-server. In this case, --image specifies a container image to deploy. The command pulls the example image from a Container Registry bucket. gcr.io/google-samples/hello-app:1.0 indicates the specific image version to pull. If a version is not specified, the latest version is used.
+
+Click Check my progress to verify the objective.
+Create a new Deployment: hello-server
+
+To create a Kubernetes Service, which is a Kubernetes resource that lets you expose your application to external traffic, run the following kubectl expose command:
+
+kubectl expose deployment hello-server --type=LoadBalancer --port 8080
+Copied!
+In this command:
+
+--port specifies the port that the container exposes.
+type="LoadBalancer" creates a Compute Engine load balancer for your container.
+Expected output:
+
+service/hello-server exposed
+To inspect the hello-server Service, run kubectl get:
+
+kubectl get service
+Copied!
+Expected output:
+
+NAME             TYPE            CLUSTER-IP      EXTERNAL-IP     PORT(S)           AGE
+hello-server     loadBalancer    10.39.244.36    35.202.234.26   8080:31991/TCP    65s
+kubernetes       ClusterIP       10.39.240.1               433/TCP           5m13s
+Note: It might take a minute for an external IP address to be generated. Run the previous command again if the EXTERNAL-IP column status is pending.
+To view the application from your web browser, open a new tab and enter the following address, replacing [EXTERNAL IP] with the EXTERNAL-IP for hello-server.
+
+http://[EXTERNAL-IP]:8080
+Copied!
+Expected output: The browser tab displays the message Hello, world! as well as the version and hostname.
+
+Click Check my progress to verify the objective.
+Create a Kubernetes Service
+
+Task 5. Deleting the cluster
+To delete the cluster, run the following command:
+
+gcloud container clusters delete lab-cluster
+Copied!
+When prompted, type Y to confirm.
+
+Deleting the cluster can take a few minutes. For more information on deleted GKE clusters from the Google Kubernetes Engine (GKE) article, Deleting a cluster.
+
+Click Check my progress to verify the objective.
